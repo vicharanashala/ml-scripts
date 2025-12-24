@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data files (large CSV/Excel files)
+Data/*.csv
+Data/*.xlsx
+Data/*.xls
+!Data/README.md
+
+# Output files (generated data)
+outputs/intermediate/*.csv
+outputs/final/*.csv
+outputs/batch_files/*.jsonl
+outputs/reports/*.txt
+
+# Logs
+logs/*.log
+
+# Duplicate groups (can be large)
+Data/groups/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# API Keys and secrets (if any config files contain them)
+.env
+secrets.yaml
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
