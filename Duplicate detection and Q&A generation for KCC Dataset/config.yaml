@@ -1,0 +1,64 @@
+# Question Deduplication Pipeline Configuration
+
+# Input/Output Settings
+input:
+  csv_file: "Data/AI_ANS_25K.csv"
+  excel_file: "Data/UP 2025 Wheat Only Final 67k.xlsx"
+  question_column: "QueryText"  # Column name containing questions
+  
+output:
+  directory: "Data/filtered"
+  suffix: "_deduplicated"
+  save_report: true
+  save_duplicates_log: true
+  export_groups: true  # Export each duplicate group as separate CSV
+  groups_directory: "Data/groups"  # Directory for group CSV files
+
+# Deduplication Strategy
+deduplication:
+  strategy: "hybrid"  # Options: exact, fuzzy, semantic, hybrid
+  
+  # Stage 1: Exact Duplicate Removal
+  exact:
+    enabled: true
+    case_sensitive: false
+    normalize_whitespace: true
+    
+  # Stage 2: Fuzzy Matching (typos, minor variations)
+  fuzzy:
+    enabled: true
+    threshold: 0.92  # 92% similarity threshold (0-1)
+    algorithm: "token_sort_ratio"  # Options: ratio, token_sort_ratio, token_set_ratio
+    max_comparisons: 50000  # Limit comparisons for large datasets (optimization)
+    use_sampling: true  # Use smart sampling for very large datasets
+    
+  # Stage 3: Semantic Similarity (different phrasings)
+  semantic:
+    enabled: true
+    model: "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+    # Alternative models:
+    # - "all-MiniLM-L6-v2" (faster, English only)
+    # - "paraphrase-multilingual-MiniLM-L12-v2" (balanced)
+    similarity_threshold: 0.88  # Cosine similarity threshold (0-1)
+    batch_size: 128  # Increased for GPU (was 32)
+    use_gpu: true  # NVIDIA H200 GPU enabled
+    cache_embeddings: true
+    
+  # Representative Selection (which question to keep from duplicates)
+  representative_selection:
+    criteria:
+      - "length"  # Prefer longer, more complete questions
+      - "answer_quality"  # Prefer questions with better answers
+    prefer_recent: false  # Set to true to keep newer questions
+    min_length: 10  # Minimum question length to consider
+
+# Processing Options
+processing:
+  show_progress: true
+  verbose: true
+  log_file: "deduplication.log"
+  
+# Performance
+performance:
+  chunk_size: 1000  # Process in chunks for large datasets
+  n_jobs: -1  # Number of parallel jobs (-1 = all cores)
